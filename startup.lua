@@ -35,8 +35,8 @@ local emergencyTemp = false
 
 local monitors = {peripheral.find("monitor")}
 monitor = monitors[1]
-local fluxgateAray = {peripheral.find("flux_gate")}
-inputfluxgate = fluxgateAray[1]
+inputfluxgate = peripheral.wrap("flux_gate_5")
+
 
 
 fluxgate = peripheral.wrap(fluxgateSide)
@@ -114,7 +114,15 @@ function buttons()
       end
       fluxgate.setSignalLowFlow(cFlow)
     end
-
+ if yPos == 10 and autoInputGate == 1 and xPos ~= 14 and xPos ~= 15 then
+ if xPos >= 2 and xPos <= 6 then
+         reactor.chargeReactor()
+      elseif xPos >= 7 and xPos <= 12 then
+         reactor.activateReactor()
+      elseif xPos >= 17 and xPos <= 26 then
+        reactor.stopReactor()
+      end
+     end
     -- input gate controls
     -- 2-4 = -1000, 6-9 = -10000, 10-12,8 = -100000
     -- 17-19 = +1000, 21-23 = +10000, 25-27 = +100000
@@ -131,6 +139,8 @@ function buttons()
         curInputGate = curInputGate+10000
       elseif xPos >= 25 and xPos <= 27 then
         curInputGate = curInputGate+1000
+	elseif xPos >= 28 and xPos <= 38 then
+        reactor.stopReactor()
       end
       inputfluxgate.setSignalLowFlow(curInputGate)
       save_config()
@@ -161,6 +171,32 @@ function drawButtons(y)
   f.draw_text(mon, 17, y, ">>>", colors.white, colors.gray)
   f.draw_text(mon, 21, y, ">> ", colors.white, colors.gray)
   f.draw_text(mon, 25, y, " > ", colors.white, colors.gray)
+end
+function drawButtons2(y)
+
+  -- 2-4 = -1000, 6-9 = -10000, 10-12,8 = -100000
+  -- 17-19 = +1000, 21-23 = +10000, 25-27 = +100000
+
+  f.draw_text(mon, 2, y, " < ", colors.white, colors.gray)
+  f.draw_text(mon, 6, y, " <<", colors.white, colors.gray)
+  f.draw_text(mon, 10, y, "<<<", colors.white, colors.gray)
+
+  f.draw_text(mon, 17, y, ">>>", colors.white, colors.gray)
+  f.draw_text(mon, 21, y, ">> ", colors.white, colors.gray)
+  f.draw_text(mon, 25, y, " > ", colors.white, colors.gray)
+  f.draw_text(mon, 28, y, " Shutdown ", colors.white, colors.red)
+end
+
+function drawButtons3(y)
+
+  -- 2-4 = -1000, 6-9 = -10000, 10-12,8 = -100000
+  -- 17-19 = +1000, 21-23 = +10000, 25-27 = +100000
+
+  f.draw_text(mon, 2, y, " Cha ", colors.white, colors.gray)
+ 
+  f.draw_text(mon, 7, y, " Act ", colors.white, colors.gray)
+
+  f.draw_text(mon, 17, y, " Shutdown", colors.white, colors.red)
 end
 
 
@@ -196,7 +232,6 @@ function update()
     elseif ri.status == "charging" then
       statusColor = colors.orange
     end
-
     f.draw_text_lr(mon, 2, 2, 1, "Reactor Status", string.upper(ri.status), colors.white, statusColor, colors.black)
 
     f.draw_text_lr(mon, 2, 4, 1, "Generation", f.format_int(ri.generationRate) .. " rf/t", colors.white, colors.lime, colors.black)
@@ -212,12 +247,14 @@ function update()
     drawButtons(8)
 
     f.draw_text_lr(mon, 2, 9, 1, "Input Gate", f.format_int(inputfluxgate.getSignalLowFlow()) .. " rf/t", colors.white, colors.blue, colors.black)
-
+   
     if autoInputGate == 1 then
       f.draw_text(mon, 14, 10, "AU", colors.white, colors.gray)
+      drawButtons3(10)
+      
     else
       f.draw_text(mon, 14, 10, "MA", colors.white, colors.gray)
-      drawButtons(10)
+      drawButtons2(10)
     end
 
     local satPercent
