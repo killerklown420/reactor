@@ -179,7 +179,7 @@ function update()
     end
 
     for k, v in pairs (ri) do
-      print(k.. ": ".. v)
+      
     end
     print("Output Gate: ", fluxgate.getSignalLowFlow())
     print("Input Gate: ", inputfluxgate.getSignalLowFlow())
